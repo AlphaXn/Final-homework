@@ -1,0 +1,167 @@
+from sklearn.model_selection import train_test_split,GridSearchCV,cross_val_predict
+from sklearn.ensemble import ExtraTreesClassifier,GradientBoostingClassifier,BaggingClassifier,RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report,accuracy_score,make_scorer,roc_curve
+from sklearn.datasets import load_digits
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import matplotlib
+font = {'family':'SimHei','size':24}
+matplotlib.rc('font',**font)
+digits = load_digits()
+x_data_all = digits.data
+y_data_all = digits.target
+print(x_data_all.shape)
+print(y_data_all.shape)
+
+
+# 划分数据集
+x_train_all,x_test,y_train_all,y_test = train_test_split(
+                                                        x_data_all,y_data_all,random_state = 114                               
+)
+print(x_train.shape,y_train.shape)
+
+# 归一化处理
+scaler = StandardScaler()
+x_train_scaled = scaler.fit_transform(x_train_all)
+x_test_scaled = scaler.transform(x_test)
+
+
+clf = RandomForestClassifier()
+parameters = {
+              'n_estimators':[9,10,11],
+              'criterion':['gini','entropy'],
+              'min_samples_split' : [2,3,4]
+}
+
+acc_scorer = make_scorer(accuracy_score)
+grid_obj = GridSearchCV(clf,parameters,scoring = acc_scorer,cv = 5)#交叉验证
+grid = grid_obj.fit(x_train_scaled,y_train_all)
+
+
+clf = grid.best_estimator_
+clf = clf.fit(x_train_scaled,y_train_all)
+test_prediction = clf.predict(x_test_scaled)
+print("测试集准确率：%s" % accuracy_score(y_test,test_prediction)) #注意中文逗号
+
+
+
+for i in range(1, 21):
+        plt.subplot(4,5, i)  #划分成4行5列
+        plt.imshow(x_test[i - 1].reshape([8, 8]), cmap=plt.cm.gray_r)
+        plt.text(60, 3, str(test_prediction[i-1])) #在图片的任意位置添加文本
+        plt.xticks([]) #认为设置坐标轴显示的刻度值
+        plt.yticks([])
+        plt.rcParams['savefig.dpi'] = 128 #图片像素
+        plt.rcParams['figure.dpi'] = 128 #分辨率
+        plt.subplots_adjust(bottom=0.2,top=1.5)
+plt.title('随机森林分类（黄子浩）')        
+plt.show()
+
+clf_1 = ExtraTreesClassifier()
+
+
+acc_scorer_1 = make_scorer(accuracy_score)
+grid_obj_1 = GridSearchCV(clf_1,parameters,scoring = acc_scorer,cv = 5)
+grid_1 = grid_obj_1.fit(x_train_scaled,y_train_all)
+
+clf_1 = grid_1.best_estimator_
+clf_1 = clf_1.fit(x_train_scaled,y_train_all)
+test_prediction_1 = clf_1.predict(x_test_scaled)
+print("测试集准确率：%s" % accuracy_score(y_test,test_prediction_1)) 
+
+
+for i in range(1, 21):
+        plt.subplot(4,5, i)  #划分成4行5列
+        plt.imshow(x_test[i - 1].reshape([8, 8]), cmap=plt.cm.gray_r)
+        plt.text(60, 3, str(test_prediction_1[i-1])) #在图片的任意位置添加文本
+        plt.xticks([]) #认为设置坐标轴显示的刻度值
+        plt.yticks([])
+        plt.rcParams['savefig.dpi'] = 128 #图片像素
+        plt.rcParams['figure.dpi'] = 128 #分辨率
+        plt.subplots_adjust(bottom=0.2,top=1.5)
+plt.title('极限随机树（黄子浩）')        
+plt.show()
+
+clf_2 = GradientBoostingClassifier()
+
+
+parameters1 = {
+              'n_estimators':[9,10,11],
+              'min_samples_split' : [2,3,4]
+}
+
+
+
+acc_scorer_2 = make_scorer(accuracy_score)
+grid_obj_2 = GridSearchCV(clf_2,parameters1,scoring = acc_scorer,cv = 5)
+grid_2 = grid_obj_2.fit(x_train_scaled,y_train_all)
+
+clf_2 = grid_2.best_estimator_
+clf_2 = clf_2.fit(x_train_scaled,y_train_all)
+test_prediction_2 = clf_2.predict(x_test_scaled)
+print("测试集准确率：%s" % accuracy_score(y_test,test_prediction_2)) 
+
+
+for i in range(1, 21):
+        plt.subplot(4,5, i)  #划分成4行5列
+        plt.imshow(x_test[i - 1].reshape([8, 8]), cmap=plt.cm.gray_r)
+        plt.text(60, 3, str(test_prediction_2[i-1])) #在图片的任意位置添加文本
+        plt.xticks([]) #认为设置坐标轴显示的刻度值
+        plt.yticks([])
+        plt.rcParams['savefig.dpi'] = 128 #图片像素
+        plt.rcParams['figure.dpi'] = 128 #分辨率
+        plt.subplots_adjust(bottom=0.2,top=1.5)
+plt.title('随机森林分类（黄子浩）')        
+plt.show()
+
+
+
+clf_3 = BaggingClassifier()
+
+parameters2 = {
+              'n_estimators':[9,10,11],
+}
+
+acc_scorer_3 = make_scorer(accuracy_score)
+grid_obj_3 = GridSearchCV(clf_3,parameters2,scoring = acc_scorer,cv = 5)
+grid_3 = grid_obj_3.fit(x_train_scaled,y_train_all)
+
+clf_3 = grid_3.best_estimator_
+clf_3 = clf_3.fit(x_train_scaled,y_train_all)
+test_prediction_3 = clf_3.predict(x_test_scaled)
+print("测试集准确率：%s" % accuracy_score(y_test,test_prediction_3)) 
+
+for i in range(1, 21):
+        plt.subplot(4,5, i)  #划分成4行5列
+        plt.imshow(x_test[i - 1].reshape([8, 8]), cmap=plt.cm.gray_r)
+        plt.text(60, 3, str(test_prediction_3[i-1])) #在图片的任意位置添加文本
+        plt.xticks([]) #认为设置坐标轴显示的刻度值
+        plt.yticks([])
+        plt.rcParams['savefig.dpi'] = 128 #图片像素
+        plt.rcParams['figure.dpi'] = 128 #分辨率
+        plt.subplots_adjust(bottom=0.2,top=1.5)
+plt.title('集成学习分类（黄子浩）')        
+plt.show()
+
+mlp = MLPClassifier(hidden_layer_sizes=(200,60),max_iter=400)
+
+mlp.fit(x_train_all,y_train_all)
+
+MLPClassifier(hidden_layer_sizes=(200, 60), max_iter=400)
+
+prediction_4 = mlp.predict(x_test)
+
+for i in range(1, 21):
+        plt.subplot(4,5, i)  #划分成4行5列
+        plt.imshow(x_test[i - 1].reshape([8, 8]), cmap=plt.cm.gray_r)
+        plt.text(60, 3, str(prediction_4[i-1])) #在图片的任意位置添加文本
+        plt.xticks([]) #认为设置坐标轴显示的刻度值
+        plt.yticks([])
+        plt.rcParams['savefig.dpi'] = 128 #图片像素
+        plt.rcParams['figure.dpi'] = 128 #分辨率
+        plt.subplots_adjust(bottom=0.2,top=1.5)
+plt.title('B-P神经网络分类图（黄子浩）')        
+plt.show()
+
+
